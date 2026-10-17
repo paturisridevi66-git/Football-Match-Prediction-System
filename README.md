@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # footy_predict
 
 A new Flutter project.
@@ -15,3 +16,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# Football-Match-Prediction-System
+>>>>>>> a0295406f770699a5b3ae490aa74b2c9569a7014
