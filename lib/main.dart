@@ -11,86 +11,69 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          title: const Text("Responsive Match Card - Exp 03"),
-          backgroundColor: Colors.green[700],
-          centerTitle: true,
-        ),
-        body: const ResponsiveMatchScreen(),
+      title: 'FootyPredict',
+      // Named Routes
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/details': (context) => const MatchDetailScreen(),
+        '/predict': (context) => const PredictionScreen(),
+      },
+    );
+  }
+}
+
+// ==================== HOME SCREEN ====================
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Football Matches"),
+        backgroundColor: Colors.green[700],
+        centerTitle: true,
       ),
-    );
-  }
-}
-
-class ResponsiveMatchScreen extends StatelessWidget {
-  const ResponsiveMatchScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Get screen width
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    // Decide layout based on screen size
-    if (screenWidth < 600) {
-      // Mobile layout
-      return const MobileLayout();
-    } else if (screenWidth < 1000) {
-      // Tablet layout
-      return const TabletLayout();
-    } else {
-      // Desktop layout
-      return const DesktopLayout();
-    }
-  }
-}
-
-// ==================== MOBILE LAYOUT ====================
-class MobileLayout extends StatelessWidget {
-  const MobileLayout({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: const [
-        Text(
-          "Mobile View",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 16),
-        MatchCard(),
-        SizedBox(height: 16),
-        MatchCard(),
-      ],
-    );
-  }
-}
-
-// ==================== TABLET LAYOUT ====================
-class TabletLayout extends StatelessWidget {
-  const TabletLayout({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            "Tablet View",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          MatchTile(
+            home: "Man United",
+            away: "Liverpool",
+            score: "2 - 1",
+            onTap: () {
+              Navigator.pushNamed(context, '/details');
+            },
+          ),
+          MatchTile(
+            home: "Arsenal",
+            away: "Chelsea",
+            score: "1 - 1",
+            onTap: () {
+              Navigator.pushNamed(context, '/details');
+            },
+          ),
+          MatchTile(
+            home: "Man City",
+            away: "Tottenham",
+            score: "3 - 0",
+            onTap: () {
+              Navigator.pushNamed(context, '/details');
+            },
           ),
           const SizedBox(height: 20),
-          Expanded(
-            child: Row(
-              children: const [
-                Expanded(child: MatchCard()),
-                SizedBox(width: 20),
-                Expanded(child: MatchCard()),
-              ],
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/predict');
+            },
+            child: const Text(
+              "Make a Prediction",
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
         ],
@@ -99,115 +82,114 @@ class TabletLayout extends StatelessWidget {
   }
 }
 
-// ==================== DESKTOP LAYOUT ====================
-class DesktopLayout extends StatelessWidget {
-  const DesktopLayout({super.key});
+// ==================== MATCH TILE ====================
+class MatchTile extends StatelessWidget {
+  final String home;
+  final String away;
+  final String score;
+  final VoidCallback onTap;
+
+  const MatchTile({
+    super.key,
+    required this.home,
+    required this.away,
+    required this.score,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Column(
-        children: [
-          const Text(
-            "Desktop View",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 30),
-          Expanded(
-            child: Row(
-              children: const [
-                Expanded(child: MatchCard()),
-                SizedBox(width: 20),
-                Expanded(child: MatchCard()),
-                SizedBox(width: 20),
-                Expanded(child: MatchCard()),
-              ],
-            ),
-          ),
-        ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        title: Text("$home  vs  $away"),
+        subtitle: Text("Score: $score"),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
       ),
     );
   }
 }
 
-// ==================== MATCH CARD ====================
-class MatchCard extends StatelessWidget {
-  const MatchCard({super.key});
+// ==================== MATCH DETAIL SCREEN ====================
+class MatchDetailScreen extends StatelessWidget {
+  const MatchDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Match Details"),
+        backgroundColor: Colors.green[700],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Premier League",
-            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // Home
-              Column(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text("MU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text("Man Utd", style: TextStyle(fontWeight: FontWeight.w600)),
-                ],
-              ),
-              // Score
-              const Column(
-                children: [
-                  Text("2 - 1", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  Text("FT", style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-              // Away
-              Column(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text("LIV", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text("Liverpool", style: TextStyle(fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ],
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Manchester United  2 - 1  Liverpool",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            const Text("Old Trafford • Full Time"),
+            const SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Go back
+              },
+              child: const Text("Go Back"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== PREDICTION SCREEN ====================
+class PredictionScreen extends StatelessWidget {
+  const PredictionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Make Prediction"),
+        backgroundColor: Colors.green[700],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Who will win?",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text("Manchester United"),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text("Draw"),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text("Liverpool"),
+            ),
+            const SizedBox(height: 40),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Back to Home"),
+            ),
+          ],
+        ),
       ),
     );
   }
