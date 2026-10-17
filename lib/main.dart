@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => PredictionProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,27 +11,39 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'FootyPredict',
+      // ========== THEME ==========
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        primaryColor: Colors.green[700],
+        scaffoldBackgroundColor: Colors.grey[100],
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.green[700],
+          centerTitle: true,
+          elevation: 0,
+          titleTextStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green[700],
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          bodyMedium: TextStyle(fontSize: 16),
+        ),
+      ),
       home: const HomeScreen(),
     );
-  }
-}
-
-// ==================== PROVIDER (State Management) ====================
-class PredictionProvider extends ChangeNotifier {
-  int _predictionCount = 0;
-  bool _isDarkMode = false;
-
-  int get predictionCount => _predictionCount;
-  bool get isDarkMode => _isDarkMode;
-
-  void increasePrediction() {
-    _predictionCount++;
-    notifyListeners(); // Important! Updates the UI
-  }
-
-  void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
   }
 }
 
@@ -47,99 +53,164 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the provider
-    final provider = Provider.of<PredictionProvider>(context);
-
     return Scaffold(
-      backgroundColor: provider.isDarkMode ? Colors.grey[900] : Colors.grey[100],
       appBar: AppBar(
-        title: const Text("State Management - Exp 05"),
-        backgroundColor: Colors.green[700],
-        actions: [
-          IconButton(
-            icon: Icon(provider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () {
-              provider.toggleTheme();
-            },
+        title: const Text("Custom Widgets & Themes"),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: const [
+          // Using our Custom Widget
+          CustomMatchCard(
+            homeTeam: "Man United",
+            awayTeam: "Liverpool",
+            homeScore: 2,
+            awayScore: 1,
+            league: "Premier League",
+          ),
+          SizedBox(height: 16),
+          CustomMatchCard(
+            homeTeam: "Arsenal",
+            awayTeam: "Chelsea",
+            homeScore: 1,
+            awayScore: 1,
+            league: "Premier League",
+          ),
+          SizedBox(height: 16),
+          CustomMatchCard(
+            homeTeam: "Barcelona",
+            awayTeam: "Real Madrid",
+            homeScore: 3,
+            awayScore: 2,
+            league: "La Liga",
           ),
         ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Predictions Made",
-              style: TextStyle(
-                fontSize: 22,
-                color: provider.isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "${provider.predictionCount}",
-              style: TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: provider.isDarkMode ? Colors.greenAccent : Colors.green[700],
-              ),
-            ),
-            const SizedBox(height: 30),
-
-            // setState example button
-            const CounterButton(),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-              ),
-              onPressed: () {
-                provider.increasePrediction();
-              },
-              child: const Text(
-                "Make Prediction (Provider)",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
-// ==================== setState EXAMPLE ====================
-class CounterButton extends StatefulWidget {
-  const CounterButton({super.key});
+// ==================== CUSTOM WIDGET ====================
+class CustomMatchCard extends StatelessWidget {
+  final String homeTeam;
+  final String awayTeam;
+  final int homeScore;
+  final int awayScore;
+  final String league;
 
-  @override
-  State<CounterButton> createState() => _CounterButtonState();
-}
-
-class _CounterButtonState extends State<CounterButton> {
-  int localCount = 0;
+  const CustomMatchCard({
+    super.key,
+    required this.homeTeam,
+    required this.awayTeam,
+    required this.homeScore,
+    required this.awayScore,
+    required this.league,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          "Local Counter (setState): $localCount",
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              localCount++;
-            });
-          },
-          child: const Text("Increase Local Counter"),
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // League
+          Text(
+            league,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Teams and Score
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // Home Team
+              Expanded(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Colors.green[100],
+                      child: Text(
+                        homeTeam.substring(0, 2).toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      homeTeam,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Score
+              Column(
+                children: [
+                  Text(
+                    "$homeScore - $awayScore",
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Text(
+                    "FT",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+
+              // Away Team
+              Expanded(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Colors.blue[100],
+                      child: Text(
+                        awayTeam.substring(0, 2).toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.blue[800],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      awayTeam,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
