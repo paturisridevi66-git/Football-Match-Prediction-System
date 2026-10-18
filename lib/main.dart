@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -11,192 +13,121 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AnimationScreen(),
+      home: const MatchListScreen(),
     );
   }
 }
 
-class AnimationScreen extends StatefulWidget {
-  const AnimationScreen({super.key});
+class MatchListScreen extends StatefulWidget {
+  const MatchListScreen({super.key});
 
   @override
-  State<AnimationScreen> createState() => _AnimationScreenState();
+  State<MatchListScreen> createState() => _MatchListScreenState();
 }
 
-class _AnimationScreenState extends State<AnimationScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _scaleAnimation;
-
-  bool _showCard = false;
+class _MatchListScreenState extends State<MatchListScreen> {
+  List<dynamic> matches = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    fetchMatches();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  // ========== FETCH DATA FROM API ==========
+  Future<void> fetchMatches() async {
+    try {
+      // Using a free public API for demo (JSONPlaceholder)
+      // In real projects you can use football-data.org (needs API key)
+      final response = await http.get(
+        Uri.parse('https://jsonplaceholder.typicode.com/posts?_limit=6'),
+      );
 
-  void _startAnimation() {
-    setState(() {
-      _showCard = true;
-    });
-    _controller.forward(from: 0);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Convert the API data into football-style matches for display
+        setState(() {
+          matches = data.map((item) {
+            return {
+              'id': item['id'],
+              'home': 'Team ${item['id']}',
+              'away': 'Opponent ${item['id']}',
+              'score': '${item['id'] % 5} - ${(item['id'] + 1) % 4}',
+              'title': item['title'],
+            };
+          }).toList();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = "Failed to load data";
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = "Error: $e";
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Animations - Exp 08"),
+        title: const Text("REST API - Exp 09"),
         backgroundColor: Colors.green[700],
         centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Animated Match Card
-            if (_showCard)
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: const AnimatedMatchCard(),
-                  ),
-                ),
-              ),
-
-            const SizedBox(height: 40),
-
-            // Button to trigger animation
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: _startAnimation,
-              child: const Text(
-                "Show Match Card with Animation",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Simple Match Card Widget
-class AnimatedMatchCard extends StatelessWidget {
-  const AnimatedMatchCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 320,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+                errorMessage = null;
+              });
+              fetchMatches();
+            },
           ),
         ],
       ),
-      child: Column(
-        children: [
-          const Text(
-            "Premier League",
-            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Column(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.red[100],
-                    child: const Text(
-                      "MU",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
+              ? Center(child: Text(errorMessage!))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: matches.length,
+                  itemBuilder: (context, index) {
+                    final match = matches[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text("Man United"),
-                ],
-              ),
-              const Column(
-                children: [
-                  Text(
-                    "2 - 1",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  Text("FT", style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-              Column(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.red[100],
-                    child: const Text(
-                      "LIV",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        title: Text(
+                          "${match['home']} vs ${match['away']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text("Score: ${match['score']}"),
+                        trailing: CircleAvatar(
+                          backgroundColor: Colors.green[100],
+                          child: Text(
+                            "${match['id']}",
+                            style: TextStyle(color: Colors.green[800]),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text("Liverpool"),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+                    );
+                  },
+                ),
     );
   }
 }
