@@ -11,205 +11,198 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'FootyPredict',
-      // ========== THEME ==========
       theme: ThemeData(
         primarySwatch: Colors.green,
         primaryColor: Colors.green[700],
-        scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.green[700],
-          centerTitle: true,
-          elevation: 0,
-          titleTextStyle: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        textTheme: const TextTheme(
-          titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          bodyMedium: TextStyle(fontSize: 16),
-        ),
       ),
-      home: const HomeScreen(),
+      home: const PredictionFormScreen(),
     );
   }
 }
 
-// ==================== HOME SCREEN ====================
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class PredictionFormScreen extends StatefulWidget {
+  const PredictionFormScreen({super.key});
+
+  @override
+  State<PredictionFormScreen> createState() => _PredictionFormScreenState();
+}
+
+class _PredictionFormScreenState extends State<PredictionFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _homeScoreController = TextEditingController();
+  final TextEditingController _awayScoreController = TextEditingController();
+
+  String? submittedMessage;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _homeScoreController.dispose();
+    _awayScoreController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        submittedMessage =
+            "Prediction Submitted!\n${_nameController.text}: ${_homeScoreController.text} - ${_awayScoreController.text}";
+      });
+
+      _nameController.clear();
+      _homeScoreController.clear();
+      _awayScoreController.clear();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Custom Widgets & Themes"),
+        title: const Text("Prediction Form - Exp 07"),
+        backgroundColor: Colors.green[700],
+        centerTitle: true,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          // Using our Custom Widget
-          CustomMatchCard(
-            homeTeam: "Man United",
-            awayTeam: "Liverpool",
-            homeScore: 2,
-            awayScore: 1,
-            league: "Premier League",
-          ),
-          SizedBox(height: 16),
-          CustomMatchCard(
-            homeTeam: "Arsenal",
-            awayTeam: "Chelsea",
-            homeScore: 1,
-            awayScore: 1,
-            league: "Premier League",
-          ),
-          SizedBox(height: 16),
-          CustomMatchCard(
-            homeTeam: "Barcelona",
-            awayTeam: "Real Madrid",
-            homeScore: 3,
-            awayScore: 2,
-            league: "La Liga",
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ==================== CUSTOM WIDGET ====================
-class CustomMatchCard extends StatelessWidget {
-  final String homeTeam;
-  final String awayTeam;
-  final int homeScore;
-  final int awayScore;
-  final String league;
-
-  const CustomMatchCard({
-    super.key,
-    required this.homeTeam,
-    required this.awayTeam,
-    required this.homeScore,
-    required this.awayScore,
-    required this.league,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // League
-          Text(
-            league,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Teams and Score
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Home Team
-              Expanded(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.green[100],
-                      child: Text(
-                        homeTeam.substring(0, 2).toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.green[800],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      homeTeam,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ],
+              const Text(
+                "Make Your Prediction",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Man United vs Liverpool",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+
+              // Name Field
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: "Your Name",
+                  hintText: "Enter your name",
+                  prefixIcon: const Icon(Icons.person),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please enter your name";
+                  }
+                  if (value.trim().length < 3) {
+                    return "Name must be at least 3 characters";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Home Score
+              TextFormField(
+                controller: _homeScoreController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Man United Score",
+                  hintText: "e.g. 2",
+                  prefixIcon: const Icon(Icons.sports_soccer),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please enter home score";
+                  }
+                  final score = int.tryParse(value);
+                  if (score == null) {
+                    return "Please enter a valid number";
+                  }
+                  if (score < 0 || score > 20) {
+                    return "Score must be between 0 and 20";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Away Score
+              TextFormField(
+                controller: _awayScoreController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Liverpool Score",
+                  hintText: "e.g. 1",
+                  prefixIcon: const Icon(Icons.sports_soccer),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please enter away score";
+                  }
+                  final score = int.tryParse(value);
+                  if (score == null) {
+                    return "Please enter a valid number";
+                  }
+                  if (score < 0 || score > 20) {
+                    return "Score must be between 0 and 20";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 30),
+
+              // Submit Button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _submitForm,
+                child: const Text(
+                  "Submit Prediction",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
 
-              // Score
-              Column(
-                children: [
-                  Text(
-                    "$homeScore - $awayScore",
+              const SizedBox(height: 20),
+
+              if (submittedMessage != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green),
+                  ),
+                  child: Text(
+                    submittedMessage!,
                     style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  const Text(
-                    "FT",
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
-              ),
-
-              // Away Team
-              Expanded(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.blue[100],
-                      child: Text(
-                        awayTeam.substring(0, 2).toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.blue[800],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      awayTeam,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ],
                 ),
-              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
