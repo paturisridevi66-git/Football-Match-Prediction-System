@@ -11,198 +11,191 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        primaryColor: Colors.green[700],
-      ),
-      home: const PredictionFormScreen(),
+      home: const AnimationScreen(),
     );
   }
 }
 
-class PredictionFormScreen extends StatefulWidget {
-  const PredictionFormScreen({super.key});
+class AnimationScreen extends StatefulWidget {
+  const AnimationScreen({super.key});
 
   @override
-  State<PredictionFormScreen> createState() => _PredictionFormScreenState();
+  State<AnimationScreen> createState() => _AnimationScreenState();
 }
 
-class _PredictionFormScreenState extends State<PredictionFormScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _AnimationScreenState extends State<AnimationScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _homeScoreController = TextEditingController();
-  final TextEditingController _awayScoreController = TextEditingController();
+  bool _showCard = false;
 
-  String? submittedMessage;
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.5),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+    );
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _homeScoreController.dispose();
-    _awayScoreController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        submittedMessage =
-            "Prediction Submitted!\n${_nameController.text}: ${_homeScoreController.text} - ${_awayScoreController.text}";
-      });
-
-      _nameController.clear();
-      _homeScoreController.clear();
-      _awayScoreController.clear();
-    }
+  void _startAnimation() {
+    setState(() {
+      _showCard = true;
+    });
+    _controller.forward(from: 0);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Prediction Form - Exp 07"),
+        title: const Text("Animations - Exp 08"),
         backgroundColor: Colors.green[700],
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Animated Match Card
+            if (_showCard)
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: const AnimatedMatchCard(),
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 40),
+
+            // Button to trigger animation
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: _startAnimation,
+              child: const Text(
+                "Show Match Card with Animation",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Simple Match Card Widget
+class AnimatedMatchCard extends StatelessWidget {
+  const AnimatedMatchCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 320,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text(
+            "Premier League",
+            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Text(
-                "Make Your Prediction",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Man United vs Liverpool",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-
-              // Name Field
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: "Your Name",
-                  hintText: "Enter your name",
-                  prefixIcon: const Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Please enter your name";
-                  }
-                  if (value.trim().length < 3) {
-                    return "Name must be at least 3 characters";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Home Score
-              TextFormField(
-                controller: _homeScoreController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Man United Score",
-                  hintText: "e.g. 2",
-                  prefixIcon: const Icon(Icons.sports_soccer),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Please enter home score";
-                  }
-                  final score = int.tryParse(value);
-                  if (score == null) {
-                    return "Please enter a valid number";
-                  }
-                  if (score < 0 || score > 20) {
-                    return "Score must be between 0 and 20";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Away Score
-              TextFormField(
-                controller: _awayScoreController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Liverpool Score",
-                  hintText: "e.g. 1",
-                  prefixIcon: const Icon(Icons.sports_soccer),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Please enter away score";
-                  }
-                  final score = int.tryParse(value);
-                  if (score == null) {
-                    return "Please enter a valid number";
-                  }
-                  if (score < 0 || score > 20) {
-                    return "Score must be between 0 and 20";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
-
-              // Submit Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: _submitForm,
-                child: const Text(
-                  "Submit Prediction",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              if (submittedMessage != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.green[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green),
-                  ),
-                  child: Text(
-                    submittedMessage!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.red[100],
+                    child: const Text(
+                      "MU",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  const Text("Man United"),
+                ],
+              ),
+              const Column(
+                children: [
+                  Text(
+                    "2 - 1",
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
+                  Text("FT", style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.red[100],
+                    child: const Text(
+                      "LIV",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text("Liverpool"),
+                ],
+              ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
