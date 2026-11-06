@@ -49,7 +49,9 @@ The Football Match Prediction System is structured across 10 progressive experim
 A foundational command-line execution validating match prediction logic, calculating match winners, querying upcoming fixtures, and managing Premier League standings using Dart classes and maps.
 
 <div align="center">
+  
   <img src="screenshots/exp01_dart_basics.svg" alt="Experiment 01 - Dart Basics Terminal Output" width="800"/>
+  
 </div>
 
 - **Features**:
