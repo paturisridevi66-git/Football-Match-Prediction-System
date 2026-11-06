@@ -48,11 +48,8 @@ The Football Match Prediction System is structured across 10 progressive experim
 
 A foundational command-line execution validating match prediction logic, calculating match winners, querying upcoming fixtures, and managing Premier League standings using Dart classes and maps.
 
-<div align="center">
-  
-  <img src="screenshots/exp01_dart_basics.svg" alt="Experiment 01 - Dart Basics Terminal Output" width="800"/>
-  
-</div>
+<img width="1387" height="861" alt="WhatsApp Image 2026-11-06 at 21 07 19" src="https://github.com/user-attachments/assets/0941aaee-bad7-4173-8369-80b9dc8c269b" />
+
 
 - **Features**:
   - Strongly typed match representations (`Match` class with `displayResult()`).
@@ -67,9 +64,8 @@ A foundational command-line execution validating match prediction logic, calcula
 
 Builds the core visual foundation of the app: a match card with custom circular team emblems (`MU` vs `LIV`), match status indicators, score typography, and stadium venue badges.
 
-<div align="center">
-  <img src="screenshots/exp02_widgets_layouts.svg" alt="Experiment 02 - Match Card Layout" width="450"/>
-</div>
+<img width="1600" height="670" alt="WhatsApp Image 2026-11-06 at 21 07 18" src="https://github.com/user-attachments/assets/ac124522-6dcf-4a42-8e04-a4d18d00c9bb" />
+
 
 - **Features**:
   - Elevated card container with rounded corners (`16px`) and subtle drop shadow.
@@ -84,9 +80,8 @@ Builds the core visual foundation of the app: a match card with custom circular 
 
 Dynamically reconfigures the UI across screen dimensions: Mobile (`< 600px`), Tablet (`600px - 1000px`), and Desktop (`> 1000px`).
 
-<div align="center">
-  <img src="screenshots/exp03_responsive_ui.svg" alt="Experiment 03 - Responsive Breakpoint Engine" width="800"/>
-</div>
+<img width="1600" height="670" alt="3 p" src="https://github.com/user-attachments/assets/b22ae4d0-a3b9-4316-b105-0d19bb6c075a" />
+
 
 - **Features**:
   - Automatically alternates between single-column scrollable feed and multi-column grid layout.
@@ -101,9 +96,8 @@ Dynamically reconfigures the UI across screen dimensions: Mobile (`< 600px`), Ta
 
 Implements multi-screen transitions across three interconnected screens: Match List Home (`/`), Detailed Match Summary (`/details`), and the Prediction Selection Screen (`/predict`).
 
-<div align="center">
-  <img src="screenshots/exp04_navigation.svg" alt="Experiment 04 - Named Routes Flow" width="850"/>
-</div>
+<img width="1600" height="670" alt="5p" src="https://github.com/user-attachments/assets/935a0793-b156-4020-b787-88edb514c545" />
+<img width="1600" height="667" alt="4p" src="https://github.com/user-attachments/assets/00a69f7d-7ed6-4c93-9381-72bd5a2fb666" />
 
 - **Features**:
   - Centralized route table: `'/'`, `'/details'`, and `'/predict'`.
@@ -117,10 +111,8 @@ Implements multi-screen transitions across three interconnected screens: Match L
 > **Key Concepts**: Ephemeral State (`setState`), App-level Reactive State (`Provider`, `ChangeNotifier`), Theme Switching.
 
 Compares local state lifecycle against centralized reactive state management. Features an interactive prediction counter and live Light/Dark mode theme toggling.
+<img width="1600" height="670" alt="5p" src="https://github.com/user-attachments/assets/9375cc32-5dcb-4147-abd5-503cb63d3b7e" />
 
-<div align="center">
-  <img src="screenshots/exp05_state_management.svg" alt="Experiment 05 - State Management Provider and setState" width="850"/>
-</div>
 
 - **Features**:
   - `PredictionProvider` extending `ChangeNotifier` with `notifyListeners()`.
@@ -135,9 +127,8 @@ Compares local state lifecycle against centralized reactive state management. Fe
 
 Introduces a centralized design language and reusable component architecture. Generates uniform match cards supporting multiple leagues (Premier League, La Liga) with customized color-coded team initials.
 
-<div align="center">
-  <img src="screenshots/exp06_custom_widgets_themes.svg" alt="Experiment 06 - Custom Widgets and Global Themes" width="450"/>
-</div>
+<img width="1600" height="675" alt="6p" src="https://github.com/user-attachments/assets/fc984ac2-b42c-4248-a248-45ea7f6aad4e" />
+
 
 - **Features**:
   - Centralized `ThemeData` configuring primary swatch, AppBar elevation, and button themes.
@@ -152,9 +143,8 @@ Introduces a centralized design language and reusable component architecture. Ge
 
 An interactive prediction submission form with input validation checking for non-empty names, minimum character lengths, and numerical score limits (0–20).
 
-<div align="center">
-  <img src="screenshots/exp07_form_validation.svg" alt="Experiment 07 - Form Handling and Validation" width="450"/>
-</div>
+<img width="1600" height="668" alt="7p" src="https://github.com/user-attachments/assets/488dcc20-52a6-4956-aed6-f40b4f19067b" />
+
 
 - **Features**:
   - Form validation with `_formKey.currentState!.validate()`.
@@ -169,9 +159,8 @@ An interactive prediction submission form with input validation checking for non
 
 Creates an animated reveal effect combining opacity fade, vertical translation, and elastic spring physics into a synchronized 800ms timeline.
 
-<div align="center">
-  <img src="screenshots/exp08_animations.svg" alt="Experiment 08 - Flutter Physics Animations" width="480"/>
-</div>
+<img width="1600" height="670" alt="8p" src="https://github.com/user-attachments/assets/c09bc23a-a0ec-49cc-b9dd-bb064dc0cade" />
+
 
 - **Features**:
   - `SingleTickerProviderStateMixin` managing VSYNC frame rendering.
@@ -186,9 +175,8 @@ Creates an animated reveal effect combining opacity fade, vertical translation, 
 
 Connects the Flutter client to a remote REST API to fetch live match payloads asynchronously, displaying a loading spinner during network transit and rendering results dynamically.
 
-<div align="center">
-  <img src="screenshots/exp09_rest_api.svg" alt="Experiment 09 - REST API Network Integration" width="450"/>
-</div>
+<img width="1600" height="670" alt="9p" src="https://github.com/user-attachments/assets/d4a4d95f-e23b-4985-9f47-b29f02f4f08c" />
+
 
 - **Features**:
   - Asynchronous HTTP GET requests with status code validation (`200 OK`).
@@ -203,9 +191,8 @@ Connects the Flutter client to a remote REST API to fetch live match payloads as
 
 Automated quality assurance suite verifying widget rendering, team name displays, and score calculations under simulated widget tree conditions.
 
-<div align="center">
-  <img src="screenshots/exp10_testing_debugging.svg" alt="Experiment 10 - Automated Unit and Widget Testing" width="850"/>
-</div>
+<img width="1600" height="628" alt="10p" src="https://github.com/user-attachments/assets/98691294-7a46-4000-a41f-9ec5adbe4e7d" />
+
 
 - **Features**:
   - Automated widget pumping (`tester.pumpWidget`) in a headless test harness.
